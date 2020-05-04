@@ -14,7 +14,7 @@ mongoose.connect(
     useNewUrlParser: true,
     useFindAndModify: false
   }
-;
+);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
