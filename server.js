@@ -1,31 +1,24 @@
 const express = require("express");
-const path = require("path");
+
+const logger = require("morgan");
+
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 
-const viewRoutes = require("./routes/views");
-
-const app = express();
 const PORT = process.env.PORT || 3000;
 
-mongoose.connect(
-  "mongodb+srv://user:user@mycluster-i5mnv.mongodb.net/workouts?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useFindAndModify: false
-  }
-);
+const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(logger("dev"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static("public"));
 
-app.use(apiRoutes);
-app.use(viewRoutes);
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true });
+const db = require("./models");
 
+require("./routes/apiRoutes")(app);
+require("./routes/htmlRoutes")(app);
 
-app.get("*", function(req, res) {
-  res.sendFile(path.join(__dirname, "./public/index.html"));
+app.listen(PORT, () => {
+    console.log(`App running on port ${PORT}!`);
 });
-
-app.listen(PORT, () => console.log("listening on port: ", PORT));
